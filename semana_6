@@ -1,0 +1,126 @@
+create database if not exists Tienda_Jesus; 
+
+use Tienda_Jesus;
+
+create table if not exists Clientes(
+id_cliente int not null primary key,
+nombre varchar (50),
+primer_apellido varchar (50),
+segundo_apellido varchar (50),
+telefono varchar (50),
+email varchar (50),
+fecha_actualizacion timestamp
+)engine=InnoDB;
+
+
+create table if not exists Direcciones(
+id_direccion int not null primary key,
+calle varchar (50),
+colonia varchar (50),
+codigo_postal varchar (50),
+municipio varchar (50),
+estado varchar (50),
+pais varchar (50),
+fecha_actualizacion timestamp,
+clientes_id_cliente int not null,
+constraint fkdirecciones_clientes 
+foreign key (clientes_id_cliente)
+references clientes(id_cliente)
+)engine=InnoDB;
+
+alter table Direcciones
+add num_exterior varchar (50);
+
+alter table Direcciones
+add num_interior varchar (50);
+
+create table if not exists Productos(
+id_producto int not null primary key,
+nombre_del_producto varchar (50),
+descripcion_del_producto varchar (50),
+precio_unitario varchar (100),
+existencias varchar (50),
+fecha_actualizacion timestamp
+)engine=InnoDB;
+
+
+create table if not exists Proveedores(
+id_proveedor int not null primary key,
+proveedor varchar (50),
+nombre_contacto varchar (50),
+telefono_contacto varchar (50),
+email_contacto varchar (50),
+fecha_actualizacion timestamp
+)engine=InnoDB;
+
+create table if not exists Direcciones_Proveedores(
+id_direccion_provedor int not null primary key,
+calle varchar (50),
+colonia varchar (50),
+codigo_postal varchar (50),
+municipio varchar (50),
+estado varchar (50),
+pais varchar (50),
+num_exterior varchar (50),
+num_interior varchar (50),
+proveedores_id_proveedor int not null,
+constraint fkDirecciones_Proveedores_Proveedores
+foreign key (Proveedores_id_proveedor)
+references Proveedores(id_proveedor)
+)engine=InnoDB;
+
+create table if not exists Ventas(
+id_venta int not null primary key auto_increment,
+fecha_de_ventas timestamp,
+total_de_venta float default 0.0,
+id_cliente int not null,
+constraint fkVentas_Clientes
+foreign key (id_cliente)
+references Clientes(id_cliente)
+)engine=InnoDB;
+
+
+create table if not exists Detalles_De_Ventas(
+id_destalle_de_ventas int not null primary key auto_increment,
+id_venta int not null,
+constraint fkDetalles_De_Ventas_Ventas
+foreign key (id_venta)
+references Ventas(id_venta),
+id_producto int not null,
+constraint fkDetalles_De_Ventas_Productos
+foreign key (id_producto)
+references Productos(id_producto),
+cantidad_de_producto float,
+precio float,
+total_por_producto float generated always as (cantidad_de_producto * precio)
+)engine=InnoDB;
+
+select * from clientes; 
+select * from productos;
+select * from ventas;
+select * from detalles_de_ventas;
+
+insert into ventas(id_cliente)
+values
+(1),
+(2),
+(3);
+
+insert into detalles_de_ventas(id_venta, id_producto, cantidad_de_producto, precio)
+values
+(1, "1", 2, 4484),
+(1, "2", 3, 3083),
+(1, "3", 2, 8536),
+(2, "4", 2, 12204),
+(2, "5", 1, 5241),
+(2, "6", 7, 1430),
+(3, "7", 1, 14585),
+(3, "8", 2, 11152),
+(3, "9", 3, 5866);
+
+select Clientes.id_cliente, clientes.nombre, clientes.primer_apellido, clientes.segundo_apellido, detalles_de_ventas.id_venta, detalles_de_ventas.cantidad_de_producto, detalles_de_ventas.precio, detalles_de_ventas.total_por_producto
+from Clientes,detalles_de_ventas
+where  detalles_de_ventas.id_destalle_de_ventas =3 = clientes.id_cliente =1;
+
+truncate table ventas;
+truncate table detalles_de_ventas
